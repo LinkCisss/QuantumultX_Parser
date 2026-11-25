@@ -1,0 +1,28 @@
+name: Sync parser fork
+
+on:
+  schedule:
+    - cron: '23 1 * * *'
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/sync-parser-fork.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-parser-fork
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository == 'LinkCisss/QuantumultX_Parser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Sync master with upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/merge-upstream" -f branch=master
